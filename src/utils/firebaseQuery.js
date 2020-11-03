@@ -1,27 +1,25 @@
+import { useEffect, useState } from 'react';
 import { firebase } from '../lib/firebase/firebase';
-import { getFromSessionStorage, saveToSessionStorage } from './dataStorage';
 
-export function getSeriesFilmsDataFromFirebase(target) {
-    let content = [];
-    if (getFromSessionStorage(target) === null) {
-        console.log("Adding to Firebase")
+export default function useContent(target) {
+    const [content, setContent] = useState([]);
+
+    useEffect(() => {
         firebase
             .firestore()
             .collection(target).limit(10)
             .get()
             .then((snapshot) => {
-                snapshot.docs.map((contentObj) => (content.push({
+                const allContent = snapshot.docs.map((contentObj) => ({
                     ...contentObj.data(),
                     docId: contentObj.id,
-                })));
-                saveToSessionStorage(content, target);
+                }));
+                setContent(allContent);
             })
             .catch((error) => {
-                console.log(error.message);
+                console.error(error.message);
             });
-    } else {
-        content = (getFromSessionStorage(target))
-    }
+    }, []);
 
-    return content
+    return { [target]: content };
 }

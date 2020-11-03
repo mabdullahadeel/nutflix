@@ -54,11 +54,14 @@ export const Text = styled.p`
     user-select: none;
     display: none;
     line-height: normal;
-`;
+
+    `;
 
 export const Entities = styled.div`
     display: flex;
     flex-direction: row;
+    max-width:
+    overflow-x: scroll;
 `;
 
 export const Meta = styled.div`

@@ -5,5 +5,9 @@ export function saveToSessionStorage(data, dataName) {
 
 export function getFromSessionStorage(dataName) {
     const userData = sessionStorage.getItem(dataName);
-    return JSON.parse(userData)
+    if (userData) {
+        return JSON.parse(userData)
+    } else {
+        return null;
+    }
 }

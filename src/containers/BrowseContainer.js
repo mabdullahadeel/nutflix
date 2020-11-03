@@ -1,4 +1,7 @@
-import { useState, useEffect, useContext, createContext } from 'react';
+import { useState, useEffect } from 'react';
+import useContent from '../utils/firebaseQuery';
+import selectionFilter from '../utils/selection-filter';
+import { saveToSessionStorage } from '../utils/dataStorage';
 // Components
 import Header from '../components/header';
 import FilmsAndSeriesContainer from './FilmsSeriesContainer';
@@ -7,17 +10,20 @@ import logo from '../logo.svg';
 import { selectUser } from '../Redux/features/userSlice';
 import { useSelector } from 'react-redux';
 
-export default function BrowseContainer({ slides }) {
+export default function BrowseContainer() {
     const user = useSelector(selectUser);
+    const { series } = useContent('series');
+    const { films } = useContent('films');
+    const slides = selectionFilter({ series, films });
+
     const [category, setCategory] = useState('series');
 
     const [searchTerm, setSearchTerm] = useState('');
-    const [slideRows, setSlideRows] = useState([]);
-
 
     useEffect(() => {
-        setSlideRows(category)
-    }, [category])
+        console.log("Saving in the Storage......");
+        saveToSessionStorage({ series: series, films: films }, 'data')
+    }, [])
 
     return (
         <>
@@ -66,7 +72,7 @@ export default function BrowseContainer({ slides }) {
             </Header>
             {/* Cards */}
             <>
-                <FilmsAndSeriesContainer cat={category} />
+                <FilmsAndSeriesContainer cat={category} slides={slides} />
             </>
         </>
     )
