@@ -89,7 +89,7 @@ export default function SignUp() {
                         Already a User? <Form.Link to="/signIn">Sign In</Form.Link>
                     </Form.Text>
                     <Form.TextSmall>
-                        This page is protected by Google reCAPTCHA  to ensure you're not a bot. <Form.Link>Learn More</Form.Link>
+                        This page is protected by Google reCAPTCHA  to ensure you're not a bot. <Form.Link to="#">Learn More</Form.Link>
                     </Form.TextSmall>
                 </Form>
             </HeaderContainer>

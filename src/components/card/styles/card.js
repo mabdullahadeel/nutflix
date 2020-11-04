@@ -60,8 +60,7 @@ export const Text = styled.p`
 export const Entities = styled.div`
     display: flex;
     flex-direction: row;
-    max-width:
-    overflow-x: scroll;
+    max-width: 100%;
 `;
 
 export const Meta = styled.div`

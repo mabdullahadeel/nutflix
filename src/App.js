@@ -18,17 +18,19 @@ function App() {
   const dispatch = useDispatch();
   // login Stuff
   useEffect(() => {
-    if (getUserDataFromLS() != null) {
+    if (getUserDataFromLS() !== null) {
       dispatch(logIn((getUserDataFromLS())))
     }
-    // else {
-    //   firebase.auth().onAuthStateChanged((authUser) => {
-    //     dispatch(logIn({
-    //       uid: authUser.uid,
-    //       email: authUser.email,
-    //     }))
-    //   })
-    // }
+    else {
+      firebase.auth().onAuthStateChanged((authUser) => {
+        dispatch(logIn({
+          uid: authUser.uid,
+          email: authUser.email,
+          displayName: authUser.user.displayName,
+          photoURL: authUser.user.photoURL,
+        }))
+      })
+    }
   }, [])
 
   return (

@@ -7,7 +7,7 @@ export default function useContent(target) {
     useEffect(() => {
         firebase
             .firestore()
-            .collection(target).limit(10)
+            .collection(target)
             .get()
             .then((snapshot) => {
                 const allContent = snapshot.docs.map((contentObj) => ({

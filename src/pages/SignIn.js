@@ -24,7 +24,6 @@ export default function SignIn() {
             .auth()
             .signInWithEmailAndPassword(emailAddress, password)
             .then((authUser) => {
-                console.log(authUser);
                 dispatch(logIn({
                     uid: authUser.user.uid,
                     email: authUser.user.email,
@@ -67,7 +66,7 @@ export default function SignIn() {
                         New to Netflix? <Form.Link to="/signUp">Sign Up</Form.Link>
                     </Form.Text>
                     <Form.TextSmall>
-                        This page is protected by Google reCAPTCHA  to ensure you're not a bot. <Form.Link>Learn More</Form.Link>
+                        This page is protected by Google reCAPTCHA  to ensure you're not a bot. <Form.Link to="#">Learn More</Form.Link>
                     </Form.TextSmall>
                 </Form>
             </HeaderContainer>

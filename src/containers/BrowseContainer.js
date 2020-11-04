@@ -1,29 +1,70 @@
 import { useState, useEffect } from 'react';
-import useContent from '../utils/firebaseQuery';
-import selectionFilter from '../utils/selection-filter';
-import { saveToSessionStorage } from '../utils/dataStorage';
 // Components
 import Header from '../components/header';
-import FilmsAndSeriesContainer from './FilmsSeriesContainer';
+import Card from '../components/card';
+import Player from '../components/player';
+
+import Fuse from 'fuse.js';
 import * as ROUTES from '../constants/routes';
 import logo from '../logo.svg';
 import { selectUser } from '../Redux/features/userSlice';
 import { useSelector } from 'react-redux';
 
-export default function BrowseContainer() {
+import movieTrailer from 'movie-trailer';
+import YouTube from 'react-youtube';
+
+import { firebase } from '../lib/firebase/firebase';
+import { logOut } from '../Redux/features/userSlice';
+import { useDispatch } from 'react-redux';
+
+export default function BrowseContainer({ slides }) {
+
     const user = useSelector(selectUser);
-    const { series } = useContent('series');
-    const { films } = useContent('films');
-    const slides = selectionFilter({ series, films });
-
     const [category, setCategory] = useState('series');
-
     const [searchTerm, setSearchTerm] = useState('');
+    const [slideRows, setSlideRows] = useState([]);
 
     useEffect(() => {
-        console.log("Saving in the Storage......");
-        saveToSessionStorage({ series: series, films: films }, 'data')
-    }, [])
+        setSlideRows(slides[category]);
+    }, [slides, category]);
+
+    useEffect(() => {
+        const fuse = new Fuse(slideRows, { threshold: 0.0, keys: ['data.description', 'data.title', 'data.genre'] });
+        const results = fuse.search(searchTerm).map((item) => item);
+
+        if (slideRows.length > 0 && searchTerm.length > 3 && results.length > 0) {
+            setSlideRows(results);
+        } else {
+            setSlideRows(slides[category]);
+        }
+    }, [searchTerm]);
+
+    const opts = {
+        height: "700",
+        width: "100%",
+        playerVars: {
+            autoplay: 1,
+        },
+    };
+
+    const [trailer, setTrailerUrl] = useState('');
+    const handleClick = (movieTitle) => {
+        console.log('Movie clicked...', movieTitle);
+        if (movieTitle) {
+            movieTrailer(movieTitle)
+                .then((url) => {
+                    const urlParams = new URLSearchParams(new URL(url).search);
+                    setTrailerUrl(urlParams.get("v"));
+                })
+                .catch((error) => {
+                    console.error(error);
+                })
+        }
+    };
+
+    // Redux
+    const dispatch = useDispatch()
+
 
     return (
         <>
@@ -48,7 +89,8 @@ export default function BrowseContainer() {
                     <Header.Group>
                         <Header.Search
                             searchTerm={searchTerm}
-                            setSearchTerm={setSearchTerm} />
+                            setSearchTerm={setSearchTerm}
+                        />
                         <Header.Profile>
                             <Header.Picture src={`/images/users/${user.photoURL}.png`} alt="User Pic" />
                             <Header.Dropdown>
@@ -56,7 +98,13 @@ export default function BrowseContainer() {
                                     <Header.Picture src={`/images/users/${user.photoURL}.png`} alt="User Pic" />
                                     <Header.TextLink>{user.displayName}</Header.TextLink>
                                 </Header.Group>
-                                <Header.TextLink onClick={() => console.log("Apply Login To Log Out of Firebase")}>SignOut</Header.TextLink>
+                                <Header.TextLink onClick={() => {
+                                    firebase.auth().signOut().then(() => {
+                                        dispatch(logOut())
+                                    })
+                                }}>
+                                    SignOut
+                                </Header.TextLink>
                             </Header.Dropdown>
                         </Header.Profile>
                     </Header.Group>
@@ -71,9 +119,32 @@ export default function BrowseContainer() {
                 </Header.Feature>
             </Header>
             {/* Cards */}
-            <>
-                <FilmsAndSeriesContainer cat={category} slides={slides} />
-            </>
+            <Card.Group>
+                {slideRows?.map((item) => (
+                    <Card key={`${category}-${item.title}`}>
+                        <Card.Title>{item.title}</Card.Title>
+                        <Card.Entities>
+                            {item?.data?.map((ent) => (
+                                <Card.Item key={ent.docId} item={ent} >
+                                    <Card.Image onClick={() => handleClick(ent.title)} src={`/images/${category}/${ent.genre}/${ent.slug}/small.jpg`} alt={ent.title} />
+                                    <Card.Meta>
+                                        <Card.SubTitle>{ent.title}</Card.SubTitle>
+                                        <Card.Text>{ent.description}</Card.Text>
+                                    </Card.Meta>
+                                </Card.Item>
+                            ))}
+                        </Card.Entities>
+                        <Card.Feature category={category}>
+                            <Player>
+                                <Player.Video setTrailerUrl={setTrailerUrl}>
+                                    <YouTube videoId={trailer} opts={opts} />
+                                </Player.Video>
+                                <Player.Button />
+                            </Player>
+                        </Card.Feature>
+                    </Card>
+                ))}
+            </Card.Group>
         </>
     )
 }
