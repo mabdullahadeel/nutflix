@@ -1,4 +1,4 @@
-# Hulu Clone 0.1 😁
+# Nutflix 🎥😁
 
 This is a netflix clone built with react. This app has all the basic features like generas categories, with ability to watch trailers of all the available movies and shows as well as read the description.
 
