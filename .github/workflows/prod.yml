@@ -1,23 +1,23 @@
-name: Deploy to Live Firebase
+name: Firebase Deploy
 
 on:
   push:
-    branches:
-      - master
-    # Optionally configure to run only for specific files. For example:
-    # paths:
-    # - "website/**"
+    branches: 
+    - master
 
 jobs:
-  deploy_live_website:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      # Add any build steps here. For example:
-      # - run: npm ci && npm run build
-      - uses: FirebaseExtended/action-hosting-deploy@v0
+      - uses: actions/setup-node@v1
         with:
-          repoToken: "${{ secrets.GITHUB_TOKEN }}"
-          firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT_NETFLIX_PRO_CLONE }}"
-          projectId: netflix-pro-clone
-          channelId: live
+          node-version: '12'
+      - run: npm ci
+      - run: npm run build
+      - name: GitHub Action for Firebase
+        uses: w9jds/firebase-action@v1.5.0
+        with:
+          args: deploy --only hosting
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_NETFLIX_PRO_CLONE }}
