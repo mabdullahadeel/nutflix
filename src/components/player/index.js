@@ -1,46 +1,55 @@
-import { useState, useContext, createContext } from 'react';
-import ReactDOM from 'react-dom';
+import { useState, useContext, createContext } from "react";
+import ReactDOM from "react-dom";
 
-import { Button, Close, Container, Inner, Overlay } from './styles/player';
+import { Button, Close, Container, Inner, Overlay } from "./styles/player";
 
 export const PlayerContext = createContext();
 
 export default function Player({ children, ...restProps }) {
-    const [showPlayer, setShowPlayer] = useState(false);
+  const [showPlayer, setShowPlayer] = useState(false);
 
-    return (
-        <PlayerContext.Provider value={{ showPlayer, setShowPlayer }}>
-            <Container {...restProps}>
-                {children}
-            </Container>
-        </PlayerContext.Provider>
-    )
+  return (
+    <PlayerContext.Provider value={{ showPlayer, setShowPlayer }}>
+      <Container {...restProps}>{children}</Container>
+    </PlayerContext.Provider>
+  );
 }
 
-Player.Video = function PlayerVideo({ src, setTrailerUrl, children, ...restProps }) {
-    const { showPlayer, setShowPlayer } = useContext(PlayerContext);
+Player.Video = function PlayerVideo({
+  src,
+  setTrailerUrl,
+  children,
+  ...restProps
+}) {
+  const { showPlayer, setShowPlayer } = useContext(PlayerContext);
 
-    return (showPlayer ? ReactDOM.createPortal(
-        <Overlay onClick={() => {
+  return showPlayer
+    ? ReactDOM.createPortal(
+        <Overlay
+          onClick={() => {
             setShowPlayer(false);
-            setTrailerUrl('');
-        }} {...restProps}>
-            <Inner>
-                {children}
-            </Inner>
-            <Close />
+            setTrailerUrl("");
+          }}
+          {...restProps}
+        >
+          <Inner>{children}</Inner>
+          <Close />
         </Overlay>,
         document.body
-    ) :
-        null)
-}
+      )
+    : null;
+};
 
 Player.Button = function PlayerButton({ ...restProps }) {
-    const { showPlayer, setShowPlayer } = useContext(PlayerContext);
+  // eslint-disable-next-line no-unused-vars
+  const { _showPlayer, setShowPlayer } = useContext(PlayerContext);
 
-    return (
-        <Button onClick={() => setShowPlayer((showPlayer) => !showPlayer)} {...restProps}>
-            Play
-        </Button>
-    );
+  return (
+    <Button
+      onClick={() => setShowPlayer((showPlayer) => !showPlayer)}
+      {...restProps}
+    >
+      Play
+    </Button>
+  );
 };
