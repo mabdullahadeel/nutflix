@@ -37,5 +37,5 @@ mkdir any_name
 ```
 
 # Demo
-- ✔ [Live Project](https://nutflux.vercel.app/)
+- ✔ [Live Project - Deployed](https://nutflux.vercel.app/)
 - ✅ https://nutflux.vercel.app/
